@@ -8,7 +8,23 @@ namespace Rzy_Protector_V2_Unpacker.Protections
 {
     class Fake_Obfuscator
     {
-        static List<string> fakeObfuscators = new List<string>{ "", "", "" };
+        static List<string> fakeObfuscators = new List<string>()
+        {
+            "DotNetPatcherObfuscatorAttribute",
+            "DotNetPatcherPackerAttribute",
+            "DotfuscatorAttribute",
+            "ObfuscatedByGoliath",
+            "dotNetProtector",
+            "PoweredByAttribute",
+            "AssemblyInfoAttribute",
+            "BabelAttribute",
+            "CryptoObfuscator.ProtectedWithCryptoObfuscatorAttribute",
+            "Xenocode.Client.Attributes.AssemblyAttributes.ProcessedByXenocode",
+            "NineRays.Obfuscator.Evaluation",
+            "YanoAttribute",
+            "SmartAssembly.Attributes.PoweredByAttribute",
+            "NetGuard",
+        };
 
         public static void Execute(ModuleDefMD module)
         {
