@@ -21,14 +21,9 @@ namespace Rzy_Protector_V2_Unpacker.Protections
                     var instr = method.Body.Instructions;
                     for (var i = 0; i < instr.Count; i++)
                     {
-                        if (instr[i].OpCode == OpCodes.Calli && instr[i - 1].OpCode == OpCodes.Ldftn)
+                        if (instr[i].OpCode == OpCodes.Ldftn && instr[i + 1].OpCode == OpCodes.Calli)
                         {
                             instr[i + 1].OpCode = OpCodes.Nop;
-
-                            //if (instr[i + 1].OpCode == OpCodes.Newobj || instr[i + 2].OpCode == OpCodes.Newobj)
-                            //    instr[i].OpCode = OpCodes.Callvirt;
-                            //else
-                            //    instr[i].OpCode = OpCodes.Call;
                             instr[i].OpCode = OpCodes.Call;
 
                             callsFixed++;
