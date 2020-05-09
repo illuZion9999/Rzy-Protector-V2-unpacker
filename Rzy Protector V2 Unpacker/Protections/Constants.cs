@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using dnlib.DotNet;
 using dnlib.DotNet.Emit;
 using static Rzy_Protector_V2_Unpacker.Logger;
@@ -6,43 +7,36 @@ using Type = Rzy_Protector_V2_Unpacker.Logger.Type;
 
 namespace Rzy_Protector_V2_Unpacker.Protections
 {
-    class Constants
+    internal static class Constants
     {
         public static void Execute(ModuleDefMD module)
         {
-            Write("Decrypting the constants...", Type.Info);
+            Write("Decrypting the constants...");
 
-            Remove_Nops.Execute(module);
+            RemoveNops.Execute(module);
             var decrypted = 0;
             MethodDef decryptionMethod = null;
-            foreach (var type in module.GetTypes().Where(t => t.HasMethods))
+            foreach (TypeDef type in module.GetTypes().Where(t => t.HasMethods))
             {
-                foreach (var method in type.Methods.Where(m => m.HasBody && m.Body.HasInstructions))
+                foreach (MethodDef method in type.Methods.Where(m => m.HasBody && m.Body.HasInstructions))
                 {
-                    var instr = method.Body.Instructions;
+                    IList<Instruction> instr = method.Body.Instructions;
                     for (var i = 0; i < instr.Count; i++)
                     {
-                        if (instr[i].OpCode == OpCodes.Ldc_I4 && instr[i + 1].OpCode == OpCodes.Ldc_I4 && instr[i + 2].OpCode == OpCodes.Call)
-                        {
-                            var callMethod = instr[i + 2].Operand as MethodDef;
+                        if (instr[i].OpCode != OpCodes.Ldc_I4 || instr[i + 1].OpCode != OpCodes.Ldc_I4 ||
+                            instr[i + 2].OpCode != OpCodes.Call) continue;
+                        
+                        decryptionMethod = instr[i + 2].Operand as MethodDef;
+                        if (decryptionMethod == null) continue;
+                        if (decryptionMethod.DeclaringType != module.GlobalType) continue;
+                        
+                        int decodedInt = (int) instr[i].Operand ^ (int) instr[i + 1].Operand;
+                        instr[i].OpCode = OpCodes.Nop;
+                        instr[i + 1].OpCode = OpCodes.Nop;
+                        instr[i + 2] = Instruction.CreateLdcI4(decodedInt);
 
-                            if (callMethod != null)
-                            {
-                                if (callMethod.DeclaringType == module.GlobalType)
-                                {
-                                    decryptionMethod = instr[i + 2].Operand as MethodDef;
-                                    int decodedInt = (int)instr[i].Operand ^ (int)instr[i + 1].Operand;
-                                    instr[i].OpCode = OpCodes.Nop;
-                                    instr[i + 1].OpCode = OpCodes.Nop;
-                                    instr[i + 2].OpCode = OpCodes.Ldc_I4;
-                                    instr[i + 2].Operand = decodedInt;
-
-                                    decrypted++;
-
-                                    Write($"Decrypted: {decodedInt.ToString()} in method: {method.Name} at offset: {instr[i + 2].Offset}", Type.Debug);
-                                }
-                            }
-                        }
+                        decrypted++;
+                        Write($"Decrypted: {decodedInt.ToString()} in method: {method.Name} at offset: {instr[i + 2].Offset}", Type.Debug);
                     }
                 }
             }

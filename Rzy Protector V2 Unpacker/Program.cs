@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using dnlib.DotNet;
 using dnlib.DotNet.Writer;
 using static Rzy_Protector_V2_Unpacker.Logger;
@@ -15,9 +11,7 @@ namespace Rzy_Protector_V2_Unpacker
 {
     class Program
     {
-        public static AssemblyDef assembly { get; private set; }
-        public static ModuleDefMD module { get; private set; }
-        public static string filePath { get; private set; }
+        private static ModuleDefMD Module { get; set; }
 
         static void Main(string[] args)
         {
@@ -33,49 +27,66 @@ namespace Rzy_Protector_V2_Unpacker
             }
 
             string directory = args[0];
-            try { module = ModuleDefMD.Load(directory); assembly = AssemblyDef.Load(directory); filePath = directory; }
-            catch { Write("Not a .NET Assembly...", Type.Error); Leave(); }
+            try
+            {
+                Module = ModuleDefMD.Load(directory);
+            }
+            catch
+            {
+                Write("Not a .NET Assembly...", Type.Error);
+                Leave();
+            }
 
             #endregion Initialize
 
             #region Unpack
 
-            Hide_Methods.Execute(module);
-            Call_to_Calli.Execute(module);
-            Empty_Types.Execute(module);
-            Maths(module);
-            Local_To_Field.Execute(module);
-            Constants.Execute(module);
-            Maths(module);
-            String_Protection.Execute(module);
+            HideMethods.Execute(Module);
+            CallToCalli.Execute(Module);
+            EmptyTypes.Execute(Module);
+            Maths(Module);
+            LocalToField.Execute(Module);
+            Constants.Execute(Module);
+            Maths(Module);
+            StringProtection.Execute(Module);
 
-            Fake_Obfuscator.Execute(module);
-            Anti_ILDasm.Execute(module);
-            Anti_De4dot.Execute(module);
-            Anti_Dnspy.Execute(module);
-            Anti_VM.Execute(module);
-            Anti_Debug.Execute(module);
-            Anti_Dump.Execute(module);
+            FakeObfuscator.Execute(Module);
+            AntiIlDasm.Execute(Module);
+            AntiDe4dot.Execute(Module);
+            AntiDnspy.Execute(Module);
+            AntiVm.Execute(Module);
+            AntiDebug.Execute(Module);
+            AntiDump.Execute(Module);
 
-            Remove_Nops.Execute(module);
+            RemoveNops.Execute(Module);
 
             #endregion Unpack
 
             #region Save the file
 
-            Write("Saving the unpacked file...", Type.Info);
+            Write("Saving the unpacked file...");
 
             string text = Path.GetDirectoryName(directory);
-            if (!text.EndsWith("\\"))
-                text += "\\";
-            string filename = string.Format("{0}{1}-Unpacked{2}", text, Path.GetFileNameWithoutExtension(directory), Path.GetExtension(directory));
-            ModuleWriterOptions writerOptions = new ModuleWriterOptions(module);
+            if (text == null)
+                Leave();
+            // We can disable the possible null exception as the Leave method closes the program (but Resharper does not detect it).
+            // ReSharper disable once PossibleNullReferenceException
+            text += !text.EndsWith("\\") ? "\\" : null;
+            string filename =
+                $"{text}{Path.GetFileNameWithoutExtension(directory)}-Unpacked{Path.GetExtension(directory)}";
+            
+            var writerOptions = new ModuleWriterOptions(Module);
             writerOptions.MetadataOptions.Flags |= MetadataFlags.PreserveAll;
             writerOptions.Logger = DummyLogger.NoThrowInstance;
-            NativeModuleWriterOptions NativewriterOptions = new NativeModuleWriterOptions(module, true);
-            NativewriterOptions.MetadataOptions.Flags |= MetadataFlags.PreserveAll;
-            NativewriterOptions.Logger = DummyLogger.NoThrowInstance;
-            if (module.IsILOnly) { module.Write(filename, writerOptions); } else { module.NativeWrite(filename, NativewriterOptions); }
+            
+            var nativewriterOptions = new NativeModuleWriterOptions(Module, true);
+            nativewriterOptions.MetadataOptions.Flags |= MetadataFlags.PreserveAll;
+            nativewriterOptions.Logger = DummyLogger.NoThrowInstance;
+            
+            if (Module.IsILOnly)
+                Module.Write(filename, writerOptions);
+            else
+                Module.NativeWrite(filename, nativewriterOptions);
 
             Write($"File saved at: {filename}", Type.Success);
             Leave();
@@ -83,10 +94,10 @@ namespace Rzy_Protector_V2_Unpacker
             #endregion Save the file
         }
 
-        static void Maths(ModuleDefMD module)
+        private static void Maths(ModuleDefMD module)
         {
-            Double_Parse.Execute(module);
-            Constants_Mutate.Execute(module);
+            DoubleParse.Execute(module);
+            ConstantsMutate.Execute(module);
         }
     }
 }

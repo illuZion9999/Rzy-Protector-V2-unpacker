@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Drawing;
 
 namespace Rzy_Protector_V2_Unpacker
 {
-    class Logger
+    internal static class Logger
     {
         public enum Type
         {
@@ -40,14 +39,10 @@ namespace Rzy_Protector_V2_Unpacker
                     Console.WriteLine($"[SUCCESS] {message}");
                     Console.ForegroundColor = ConsoleColor.White;
                     break;
+                
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
-        }
-
-        public static void Write(string message, ConsoleColor consoleColor)
-        {
-            Console.ForegroundColor = consoleColor;
-            Console.WriteLine(message);
-            Console.ForegroundColor = ConsoleColor.White;
         }
 
         public static void Leave()

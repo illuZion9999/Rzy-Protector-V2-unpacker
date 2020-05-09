@@ -49,22 +49,22 @@
     <Compile Include="Logger.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Protections\Antis\Anti De4dot.cs" />
-    <Compile Include="Protections\Antis\Anti Debug.cs" />
-    <Compile Include="Protections\Antis\Anti Dnspy.cs" />
-    <Compile Include="Protections\Antis\Anti Dump.cs" />
-    <Compile Include="Protections\Antis\Anti ILDasm.cs" />
-    <Compile Include="Protections\Antis\Anti VM.cs" />
-    <Compile Include="Protections\Call to Calli.cs" />
-    <Compile Include="Protections\Empty Types.cs" />
-    <Compile Include="Protections\Fake Obfuscator.cs" />
-    <Compile Include="Protections\Remove_Nops.cs" />
-    <Compile Include="Protections\Constants Mutate.cs" />
-    <Compile Include="Protections\Hide Methods.cs" />
+    <Compile Include="Protections\Antis\AntiDe4dot.cs" />
+    <Compile Include="Protections\Antis\AntiDebug.cs" />
+    <Compile Include="Protections\Antis\AntiDnspy.cs" />
+    <Compile Include="Protections\Antis\AntiDump.cs" />
+    <Compile Include="Protections\Antis\AntiIlDasm.cs" />
+    <Compile Include="Protections\Antis\AntiVm.cs" />
+    <Compile Include="Protections\CallToCalli.cs" />
+    <Compile Include="Protections\EmptyTypes.cs" />
+    <Compile Include="Protections\FakeObfuscator.cs" />
+    <Compile Include="Protections\RemoveNops.cs" />
+    <Compile Include="Protections\ConstantsMutate.cs" />
+    <Compile Include="Protections\HideMethods.cs" />
     <Compile Include="Protections\Constants.cs" />
-    <Compile Include="Protections\Local To Field.cs" />
-    <Compile Include="Protections\Double.Parse.cs" />
-    <Compile Include="Protections\String Protection.cs" />
+    <Compile Include="Protections\LocalToField.cs" />
+    <Compile Include="Protections\DoubleParse.cs" />
+    <Compile Include="Protections\StringProtection.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>

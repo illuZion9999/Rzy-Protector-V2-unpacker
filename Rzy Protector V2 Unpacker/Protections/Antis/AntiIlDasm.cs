@@ -4,17 +4,17 @@ using Type = Rzy_Protector_V2_Unpacker.Logger.Type;
 
 namespace Rzy_Protector_V2_Unpacker.Protections.Antis
 {
-    class Anti_ILDasm
+    internal static class AntiIlDasm
     {
         public static void Execute(ModuleDefMD module)
         {
-            Write("Removing the Anti ILDasm...", Type.Info);
+            Write("Removing the Anti ILDasm...");
 
             var removed = 0;
-            CustomAttribute ILDasm = module.CustomAttributes.Find(module.CorLibTypes.GetTypeRef("System.Runtime.CompilerServices", "SuppressIldasmAttribute"));
-            if (ILDasm != null)
+            CustomAttribute antiIlDasmAttribute = module.CustomAttributes.Find(module.CorLibTypes.GetTypeRef("System.Runtime.CompilerServices", "SuppressIldasmAttribute"));
+            if (antiIlDasmAttribute != null)
             {
-                module.CustomAttributes.Remove(ILDasm);
+                module.CustomAttributes.Remove(antiIlDasmAttribute);
                 removed++;
             }
 

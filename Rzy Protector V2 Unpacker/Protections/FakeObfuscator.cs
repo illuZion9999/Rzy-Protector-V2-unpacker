@@ -6,9 +6,9 @@ using Type = Rzy_Protector_V2_Unpacker.Logger.Type;
 
 namespace Rzy_Protector_V2_Unpacker.Protections
 {
-    class Fake_Obfuscator
+    internal static class FakeObfuscator
     {
-        static List<string> fakeObfuscators = new List<string>()
+        private static readonly List<string> FakeObfuscators = new List<string>()
         {
             "DotNetPatcherObfuscatorAttribute",
             "DotNetPatcherPackerAttribute",
@@ -28,20 +28,16 @@ namespace Rzy_Protector_V2_Unpacker.Protections
 
         public static void Execute(ModuleDefMD module)
         {
-            Write("Removing the Fake Obfuscators...", Type.Info);
+            Write("Removing the Fake Obfuscators...");
 
-            Remove_Nops.Execute(module);
+            RemoveNops.Execute(module);
             var removed = 0;
-            foreach (var type in module.Types.ToList())
+            foreach (TypeDef type in module.Types.ToList().Where(t => FakeObfuscators.Contains(t.Name)))
             {
-                if (fakeObfuscators.Contains(type.Name))
-                {
-                    module.Types.Remove(type);
+                module.Types.Remove(type);
 
-                    removed++;
-
-                    Write($"Removed the fake obfuscator type: {type.Name}", Type.Debug);
-                }
+                removed++;
+                Write($"Removed the fake obfuscator type: {type.Name}", Type.Debug);
             }
 
             Write(removed == 0 ? "No Fake Obfscators found !" :
